@@ -1,0 +1,35 @@
+{
+  "$schema": "https://decispher.com/schemas/context-rules/v1.json",
+  "specVersion": "2.0.0",
+  "generatedAt": "2026-07-12T19:13:24.064Z",
+  "companyId": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16",
+  "projectId": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
+  "meta": {
+    "totalRules": 0,
+    "rulesByType": {
+      "decision": 0,
+      "convention": 0,
+      "constraint": 0,
+      "rationale": 0,
+      "ownership": 0,
+      "history": 0,
+      "plan": 0
+    },
+    "rulesBySeverity": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0
+    },
+    "generator": "decispher-context-map@1.0.0"
+  },
+  "mcp": {
+    "instruction": "Enforcement manifest only — rule titles, severities, and file patterns. It does NOT contain the rationale, alternatives, or full body of any rule, and it may be stale relative to the live knowledge base. Do NOT treat this file as sufficient context. Before writing or reviewing code that touches a listed file pattern, call the MCP tool named in that rule's `mcpFetch` field to load the authoritative, up-to-date context. MCP is the source of truth.",
+    "tools": {
+      "getDecision": "decispher.get_decision({ decisionId })",
+      "getContextForTopic": "decispher.get_context_for_topic({ topic })",
+      "listTopics": "decispher.list_topics()"
+    }
+  },
+  "rules": []
+}

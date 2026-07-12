@@ -12,3 +12,6 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# Decispher session buffer (local only)
+.decispher/.session/

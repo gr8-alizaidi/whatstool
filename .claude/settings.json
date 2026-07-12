@@ -1,0 +1,64 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs session-start",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs user-prompt",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Bash|Edit|Write|MultiEdit|AskUserQuestion",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs post-tool",
+                        "timeout": 15
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs stop",
+                        "timeout": 30
+                    }
+                ]
+            }
+        ],
+        "SessionEnd": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs session-end",
+                        "timeout": 15
+                    }
+                ]
+            }
+        ]
+    },
+    "statusLine": {
+        "type": "command",
+        "command": "node .decispher/hooks/decispher-hook.mjs statusline"
+    }
+}

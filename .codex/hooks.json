@@ -1,0 +1,49 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs codex-session-start",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs codex-user-prompt",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Bash|apply_patch",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs codex-post-tool",
+                        "timeout": 15
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs codex-stop",
+                        "timeout": 30
+                    }
+                ]
+            }
+        ]
+    }
+}

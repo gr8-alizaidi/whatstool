@@ -1,13 +1,13 @@
 {
   "$schema": "https://decispher.com/schemas/context-rules/v1.json",
   "specVersion": "2.0.0",
-  "generatedAt": "2026-07-12T20:10:24.277Z",
+  "generatedAt": "2026-07-12T20:48:39.842Z",
   "companyId": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16",
   "projectId": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
   "meta": {
-    "totalRules": 0,
+    "totalRules": 1,
     "rulesByType": {
-      "decision": 0,
+      "decision": 1,
       "convention": 0,
       "constraint": 0,
       "rationale": 0,
@@ -18,7 +18,7 @@
     "rulesBySeverity": {
       "CRITICAL": 0,
       "HIGH": 0,
-      "MEDIUM": 0,
+      "MEDIUM": 1,
       "LOW": 0
     },
     "generator": "decispher-context-map@1.0.0"
@@ -31,5 +31,33 @@
       "listTopics": "decispher.list_topics()"
     }
   },
-  "rules": []
+  "rules": [
+    {
+      "id": "eb14c947-c61c-473a-a951-c89840fe9280",
+      "type": "decision",
+      "title": "Enforce WhatsApp screen limit with AccessibilityService and SharedPreferences",
+      "severity": "MEDIUM",
+      "status": "active",
+      "affectedFiles": [
+        "app/src/main/java/com/whatstools/walkChat/BasicAccessibilityService.java",
+        "app/src/main/java/com/whatstools/screenlimit/ScreenLimitManager.java",
+        "app/src/main/java/com/whatstools/screenlimit/ScreenLimitSettingsActivity.java",
+        "app/src/main/java/com/whatstools/screenlimit/WhatsAppLimitBlockActivity.java",
+        "app/src/main/res/layout/activity_screen_limit_settings.xml",
+        "app/src/main/res/layout/activity_screen_limit_block.xml",
+        "app/src/main/res/layout/activity_main.xml",
+        "app/src/main/AndroidManifest.xml"
+      ],
+      "tags": [
+        "whatsapp",
+        "screen-time",
+        "accessibility",
+        "xml",
+        "non-compose"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"eb14c947-c61c-473a-a951-c89840fe9280\" })"
+    }
+  ]
 }

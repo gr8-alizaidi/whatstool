@@ -1,0 +1,36 @@
+{
+  "schema": "decispher-context-map/v1",
+  "generatedAt": "2026-07-12T20:10:24.277Z",
+  "project": {
+    "id": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
+    "name": "Demo"
+  },
+  "company": {
+    "id": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16"
+  },
+  "spine": [],
+  "topics": [],
+  "mcp": {
+    "endpoint": null,
+    "tools": [
+      "decispher.check_intent",
+      "decispher.get_constraints",
+      "decispher.check_conventions",
+      "decispher.get_context_for_file",
+      "decispher.get_context_for_topic",
+      "decispher.list_topics",
+      "decispher.search_decisions",
+      "decispher.get_decision",
+      "decispher.ask_knowledge_base",
+      "decispher.capture_decision",
+      "decispher.update_context_metadata",
+      "decispher.store_read",
+      "decispher.store_write",
+      "decispher.session_record",
+      "decispher.store_link",
+      "decispher.store_list",
+      "decispher.copy_chat",
+      "decispher.paste_chat"
+    ]
+  }
+}

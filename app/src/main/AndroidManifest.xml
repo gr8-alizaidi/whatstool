@@ -56,6 +56,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme1"
             />
+        <activity
+            android:name="com.whatstools.screenlimit.ScreenLimitSettingsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name="com.whatstools.screenlimit.WhatsAppLimitBlockActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme1" />
 
         <activity
             android:name="com.whatstools.whatsWebScan.WebActivity"

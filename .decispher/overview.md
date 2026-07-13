@@ -12,10 +12,12 @@ _No topics with active units yet._
 
 ## Recent changes
 
-_No recent changes._
+- 2026-07-12 · Enforce WhatsApp screen limit with AccessibilityService and SharedPreferences
 
 ## Need something not here?
 
 Call `decispher.list_topics()` for the live topic list (may differ from this file if new topics were added since the last sync).
 
 Call `decispher.search_decisions({ query: "your question" })` to search across all context.
+
+**1 unit not yet assigned to a topic** — see `.decispher/unmapped-context.md`.

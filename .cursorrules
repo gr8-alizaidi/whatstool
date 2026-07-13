@@ -11,6 +11,11 @@
 # BEFORE YOU STOP: decispher.store_write (handoff) + decispher.session_record for non-obvious decisions.
 
 
+# Topics — load on demand:
+- c/decispher-demo-mri2fy8z/screen-limit (screen limit) -> decispher.get_context_for_topic({ topic: "c/decispher-demo-mri2fy8z/screen-limit" })
+- c/decispher-demo-mri2fy8z/team-detail (team detail) -> decispher.get_context_for_topic({ topic: "c/decispher-demo-mri2fy8z/team-detail" })
+- c/decispher-demo-mri2fy8z/whatstool-design-choice (whatstool design choice) -> decispher.get_context_for_topic({ topic: "c/decispher-demo-mri2fy8z/whatstool-design-choice" })
+
 # Decispher MCP tools
 # Call proactively when relevant (agent-invoked):
 #   decispher.check_intent — before implementing something potentially constrained — verify against active decisions

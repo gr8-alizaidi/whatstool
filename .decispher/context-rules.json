@@ -1,13 +1,13 @@
 {
   "$schema": "https://decispher.com/schemas/context-rules/v1.json",
   "specVersion": "2.0.0",
-  "generatedAt": "2026-07-13T04:49:27.145Z",
+  "generatedAt": "2026-07-13T04:50:01.374Z",
   "companyId": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16",
   "projectId": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
   "meta": {
-    "totalRules": 5,
+    "totalRules": 6,
     "rulesByType": {
-      "decision": 2,
+      "decision": 3,
       "convention": 0,
       "constraint": 0,
       "rationale": 0,
@@ -18,7 +18,7 @@
     "rulesBySeverity": {
       "CRITICAL": 0,
       "HIGH": 1,
-      "MEDIUM": 3,
+      "MEDIUM": 4,
       "LOW": 1
     },
     "generator": "decispher-context-map@1.0.0"
@@ -44,7 +44,12 @@
         "refactoring"
       ],
       "supersededBy": null,
-      "enforcement": null,
+      "enforcement": {
+        "blockOnViolation": false,
+        "requiresExplicitOverride": false,
+        "filePatterns": [],
+        "exemptPatterns": []
+      },
       "mcpFetch": "decispher.get_decision({ decisionId: \"fe011105-94d5-436a-8878-4c58d6e0b4f2\" })"
     },
     {
@@ -60,7 +65,12 @@
         "refactoring"
       ],
       "supersededBy": null,
-      "enforcement": null,
+      "enforcement": {
+        "blockOnViolation": false,
+        "requiresExplicitOverride": false,
+        "filePatterns": [],
+        "exemptPatterns": []
+      },
       "mcpFetch": "decispher.get_decision({ decisionId: \"e67b7433-0570-4d78-862d-bd8e9db0f0bb\" })"
     },
     {
@@ -102,8 +112,34 @@
         "testing"
       ],
       "supersededBy": null,
-      "enforcement": null,
+      "enforcement": {
+        "blockOnViolation": false,
+        "requiresExplicitOverride": false,
+        "filePatterns": [],
+        "exemptPatterns": []
+      },
       "mcpFetch": "decispher.get_decision({ decisionId: \"b126fbd7-c2df-4390-a2fa-298e0bd8aa43\" })"
+    },
+    {
+      "id": "8e967258-7885-4e8d-8c09-c509d575243a",
+      "type": "decision",
+      "title": "Use XML layouts instead of Compose for the Whatstool Android application",
+      "severity": "MEDIUM",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "android",
+        "frontend",
+        "layout"
+      ],
+      "supersededBy": null,
+      "enforcement": {
+        "blockOnViolation": false,
+        "requiresExplicitOverride": false,
+        "filePatterns": [],
+        "exemptPatterns": []
+      },
+      "mcpFetch": "decispher.get_decision({ decisionId: \"8e967258-7885-4e8d-8c09-c509d575243a\" })"
     },
     {
       "id": "01a27519-5ec9-4fa6-a8ca-7d344bf52316",

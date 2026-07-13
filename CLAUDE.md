@@ -28,7 +28,11 @@ _No always-apply rules yet — fetch via MCP when working on a topic._
 
 ## When working on a topic
 
-_No topics yet — call `decispher.list_topics()` to discover at runtime._
+Fetch the full topic context before writing code:
+
+- **c/decispher-demo-mri2fy8z/screen-limit** (screen limit) → `decispher.get_context_for_topic({ topic: "c/decispher-demo-mri2fy8z/screen-limit" })`
+- **c/decispher-demo-mri2fy8z/team-detail** (team detail) → `decispher.get_context_for_topic({ topic: "c/decispher-demo-mri2fy8z/team-detail" })`
+- **c/decispher-demo-mri2fy8z/whatstool-design-choice** (whatstool design choice) → `decispher.get_context_for_topic({ topic: "c/decispher-demo-mri2fy8z/whatstool-design-choice" })`
 
 ## Decispher MCP tools
 

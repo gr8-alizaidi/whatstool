@@ -1,6 +1,6 @@
 {
   "schema": "decispher-context-map/v1",
-  "generatedAt": "2026-07-12T20:48:39.842Z",
+  "generatedAt": "2026-07-13T05:10:26.768Z",
   "project": {
     "id": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
     "name": "Demo"
@@ -9,7 +9,41 @@
     "id": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16"
   },
   "spine": [],
-  "topics": [],
+  "topics": [
+    {
+      "id": "c/decispher-demo-mri2fy8z/screen-limit",
+      "label": "screen limit",
+      "description": "This topic covers decision we made explicitly about screen limit feature",
+      "unitCount": 1,
+      "spineUnitCount": 0,
+      "expansionUnitCount": 1,
+      "tokensInStub": 0,
+      "stubPath": ".decispher/topics/c/decispher-demo-mri2fy8z/screen-limit.md",
+      "mcpTool": "decispher.get_context_for_topic"
+    },
+    {
+      "id": "c/decispher-demo-mri2fy8z/team-detail",
+      "label": "team detail",
+      "description": "This topic contains ownership information within our organisation",
+      "unitCount": 3,
+      "spineUnitCount": 0,
+      "expansionUnitCount": 3,
+      "tokensInStub": 0,
+      "stubPath": ".decispher/topics/c/decispher-demo-mri2fy8z/team-detail.md",
+      "mcpTool": "decispher.get_context_for_topic"
+    },
+    {
+      "id": "c/decispher-demo-mri2fy8z/whatstool-design-choice",
+      "label": "whatstool design choice",
+      "description": "This topic covers all the design choice we made for our app",
+      "unitCount": 3,
+      "spineUnitCount": 0,
+      "expansionUnitCount": 3,
+      "tokensInStub": 0,
+      "stubPath": ".decispher/topics/c/decispher-demo-mri2fy8z/whatstool-design-choice.md",
+      "mcpTool": "decispher.get_context_for_topic"
+    }
+  ],
   "mcp": {
     "endpoint": null,
     "tools": [

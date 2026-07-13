@@ -23,6 +23,7 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.startapp.android.publish.ads.banner.Banner;
 import com.startapp.android.publish.adsCommon.StartAppAd;
 import com.whatstools.asciiFaces.AsciiFacesMainActivity;
+import com.whatstools.birthday.BirthdayReminderActivity;
 import com.whatstools.captionStatusShare.Captionitem;
 import com.whatstools.cleaner.WACleanMainActivity;
 import com.whatstools.directChat.ChatDirect;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout linearWPTextRepeter;
     LinearLayout linearWPWalk;
     LinearLayout linearScreenLimit;
+    LinearLayout linearBirthdayReminder;
     private InterstitialAd mInterstitialAdMob;
     public int varCounter;
     int isCallFor;
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         this.linearWhatsApAsciFace = findViewById(R.id.ascifaces);
         this.linearRateUs = findViewById(R.id.rateus);
         this.linearScreenLimit = findViewById(R.id.screenLimit);
+        this.linearBirthdayReminder = findViewById(R.id.birthdayReminder);
 
         this.linearWPAppShortcut.setOnClickListener(new btnWhatsappShortcutListner());
         this.whatsWeb.setOnClickListener(new btnWhatsWebClick());
@@ -105,6 +108,11 @@ public class MainActivity extends AppCompatActivity {
         this.linearScreenLimit.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 MainActivity.this.startActivity(new Intent(MainActivity.this, ScreenLimitSettingsActivity.class));
+            }
+        });
+        this.linearBirthdayReminder.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                MainActivity.this.startActivity(new Intent(MainActivity.this, BirthdayReminderActivity.class));
             }
         });
 

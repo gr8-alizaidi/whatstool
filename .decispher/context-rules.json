@@ -1,25 +1,25 @@
 {
   "$schema": "https://decispher.com/schemas/context-rules/v1.json",
   "specVersion": "2.0.0",
-  "generatedAt": "2026-07-12T20:48:39.842Z",
+  "generatedAt": "2026-07-13T04:49:27.145Z",
   "companyId": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16",
   "projectId": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
   "meta": {
-    "totalRules": 1,
+    "totalRules": 5,
     "rulesByType": {
-      "decision": 1,
+      "decision": 2,
       "convention": 0,
       "constraint": 0,
       "rationale": 0,
-      "ownership": 0,
+      "ownership": 3,
       "history": 0,
       "plan": 0
     },
     "rulesBySeverity": {
       "CRITICAL": 0,
-      "HIGH": 0,
-      "MEDIUM": 1,
-      "LOW": 0
+      "HIGH": 1,
+      "MEDIUM": 3,
+      "LOW": 1
     },
     "generator": "decispher-context-map@1.0.0"
   },
@@ -32,6 +32,37 @@
     }
   },
   "rules": [
+    {
+      "id": "fe011105-94d5-436a-8878-4c58d6e0b4f2",
+      "type": "decision",
+      "title": "Create a base class for all Activity classes",
+      "severity": "HIGH",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "architecture",
+        "refactoring"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"fe011105-94d5-436a-8878-4c58d6e0b4f2\" })"
+    },
+    {
+      "id": "e67b7433-0570-4d78-862d-bd8e9db0f0bb",
+      "type": "ownership",
+      "title": "Development ownership for Activity base class refactoring",
+      "severity": "MEDIUM",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "ownership",
+        "architecture",
+        "refactoring"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"e67b7433-0570-4d78-862d-bd8e9db0f0bb\" })"
+    },
     {
       "id": "eb14c947-c61c-473a-a951-c89840fe9280",
       "type": "decision",
@@ -58,6 +89,41 @@
       "supersededBy": null,
       "enforcement": null,
       "mcpFetch": "decispher.get_decision({ decisionId: \"eb14c947-c61c-473a-a951-c89840fe9280\" })"
+    },
+    {
+      "id": "b126fbd7-c2df-4390-a2fa-298e0bd8aa43",
+      "type": "ownership",
+      "title": "Testing ownership for post-revamp activity features",
+      "severity": "MEDIUM",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "ownership",
+        "testing"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"b126fbd7-c2df-4390-a2fa-298e0bd8aa43\" })"
+    },
+    {
+      "id": "01a27519-5ec9-4fa6-a8ca-7d344bf52316",
+      "type": "ownership",
+      "title": "Manager assignment for the Activity revamp teams",
+      "severity": "LOW",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "ownership",
+        "management"
+      ],
+      "supersededBy": null,
+      "enforcement": {
+        "blockOnViolation": false,
+        "requiresExplicitOverride": false,
+        "filePatterns": [],
+        "exemptPatterns": []
+      },
+      "mcpFetch": "decispher.get_decision({ decisionId: \"01a27519-5ec9-4fa6-a8ca-7d344bf52316\" })"
     }
   ]
 }

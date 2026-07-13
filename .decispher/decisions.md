@@ -5,8 +5,24 @@
 **Date**: 2026-07-13  
 **Severity**: Critical
 
-**Files**:
-- `**/*`
+**Rules**:
+```json
+{
+  "conditions": [
+    {
+      "type": "file",
+      "pattern": "**/*.{ts,js,java,kt}",
+      "content_rules": [
+        {
+          "mode": "regex",
+          "pattern": "class\\s+\\w+Activity\\s+(?!extends\\s+BaseActivity)"
+        }
+      ]
+    }
+  ],
+  "match_mode": "all"
+}
+```
 
 ### Context
 
@@ -21,8 +37,27 @@
 **Date**: 2026-07-13  
 **Severity**: Warning
 
-**Files**:
-- `**/*`
+**Rules**:
+```json
+{
+  "conditions": [
+    {
+      "type": "file",
+      "pattern": "**/*",
+      "content_rules": [
+        {
+          "mode": "string",
+          "patterns": [
+            "Activity",
+            "BaseActivity"
+          ]
+        }
+      ]
+    }
+  ],
+  "match_mode": "all"
+}
+```
 
 ### Context
 
@@ -60,12 +95,65 @@
 **Date**: 2026-07-13  
 **Severity**: Warning
 
-**Files**:
-- `**/*`
+**Rules**:
+```json
+{
+  "conditions": [
+    {
+      "type": "file",
+      "pattern": "**/*",
+      "content_rules": [
+        {
+          "mode": "full_file"
+        }
+      ]
+    }
+  ],
+  "match_mode": "all"
+}
+```
 
 ### Context
 
 **Decision:** Ron and his team will be responsible for testing all features after the activity revamp is complete.
+
+---
+
+<!-- DECISION-8E967258 -->
+## Decision: Use XML layouts instead of Compose for the Whatstool Android application
+
+**Status**: Active  
+**Date**: 2026-07-12  
+**Severity**: Warning
+
+**Rules**:
+```json
+{
+  "conditions": [
+    {
+      "type": "file",
+      "pattern": "**/*",
+      "content_rules": [
+        {
+          "mode": "string",
+          "patterns": [
+            "androidx.compose",
+            "setContent {",
+            "Column {",
+            "Row {"
+          ]
+        }
+      ],
+      "content_match_mode": "any"
+    }
+  ],
+  "match_mode": "all"
+}
+```
+
+### Context
+
+**Decision:** We decided not to use the latest Compose style layout for the Whatstool app, and will instead have Jason and his team develop the Android part of the app using traditional XML layouts.
 
 ---
 

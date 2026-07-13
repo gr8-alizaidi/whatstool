@@ -16,6 +16,7 @@ _No topics with active units yet._
 - 2026-07-13 · Testing ownership for post-revamp activity features
 - 2026-07-13 · Development ownership for Activity base class refactoring
 - 2026-07-13 · Create a base class for all Activity classes
+- 2026-07-12 · Use XML layouts instead of Compose for the Whatstool Android application
 - 2026-07-12 · Enforce WhatsApp screen limit with AccessibilityService and SharedPreferences
 
 ## Need something not here?
@@ -24,4 +25,4 @@ Call `decispher.list_topics()` for the live topic list (may differ from this fil
 
 Call `decispher.search_decisions({ query: "your question" })` to search across all context.
 
-**5 units not yet assigned to a topic** — see `.decispher/unmapped-context.md`.
+**6 units not yet assigned to a topic** — see `.decispher/unmapped-context.md`.

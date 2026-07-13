@@ -1,14 +1,14 @@
 {
   "$schema": "https://decispher.com/schemas/context-rules/v1.json",
   "specVersion": "2.0.0",
-  "generatedAt": "2026-07-13T04:51:36.141Z",
+  "generatedAt": "2026-07-13T05:10:26.768Z",
   "companyId": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16",
   "projectId": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
   "meta": {
-    "totalRules": 6,
+    "totalRules": 7,
     "rulesByType": {
       "decision": 3,
-      "convention": 0,
+      "convention": 1,
       "constraint": 0,
       "rationale": 0,
       "ownership": 3,
@@ -19,7 +19,7 @@
       "CRITICAL": 0,
       "HIGH": 1,
       "MEDIUM": 4,
-      "LOW": 1
+      "LOW": 2
     },
     "generator": "decispher-context-map@1.0.0"
   },
@@ -140,6 +140,24 @@
         "exemptPatterns": []
       },
       "mcpFetch": "decispher.get_decision({ decisionId: \"8e967258-7885-4e8d-8c09-c509d575243a\" })"
+    },
+    {
+      "id": "44aa03f0-84c5-47c6-a057-4623e30366dd",
+      "type": "convention",
+      "title": "Apply app branding to all user action output layouts",
+      "severity": "LOW",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "branding",
+        "android",
+        "ui",
+        "convention",
+        "fusion:pending_review"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"44aa03f0-84c5-47c6-a057-4623e30366dd\" })"
     },
     {
       "id": "01a27519-5ec9-4fa6-a8ca-7d344bf52316",

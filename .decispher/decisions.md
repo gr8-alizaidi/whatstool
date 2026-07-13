@@ -157,6 +157,22 @@
 
 ---
 
+<!-- DECISION-44AA03F0 -->
+## Decision: Apply app branding to all user action output layouts
+
+**Status**: Active  
+**Date**: 2026-07-13  
+**Severity**: Info
+
+**Files**:
+- `**/*`
+
+### Context
+
+**Decision:** All layouts that are shown in response to user actions, such as screen restrictions or content sharing, must include application branding (such as 'via whatstool') either in the WhatsApp message section or at the bottom of the layout.
+
+---
+
 <!-- DECISION-01A27519 -->
 ## Decision: Manager assignment for the Activity revamp teams
 

@@ -32,6 +32,7 @@ import com.whatstools.gallery.MainWhatsGalleryActivity;
 import com.whatstools.shakeShortcut.ShakeMain;
 import com.whatstools.statusSaver.StatusSaverMainActivity;
 import com.whatstools.textRepeater.MainTextRepeater;
+import com.whatstools.screenlimit.ScreenLimitSettingsActivity;
 import com.whatstools.walkChat.WalkMainActivity;
 import com.whatstools.whatsWebScan.WebActivity;
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout linearWpAppStatusSaver;
     LinearLayout linearWPTextRepeter;
     LinearLayout linearWPWalk;
+    LinearLayout linearScreenLimit;
     private InterstitialAd mInterstitialAdMob;
     public int varCounter;
     int isCallFor;
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         this.linearWPFakeChat = findViewById(R.id.FackChat);
         this.linearWhatsApAsciFace = findViewById(R.id.ascifaces);
         this.linearRateUs = findViewById(R.id.rateus);
+        this.linearScreenLimit = findViewById(R.id.screenLimit);
 
         this.linearWPAppShortcut.setOnClickListener(new btnWhatsappShortcutListner());
         this.whatsWeb.setOnClickListener(new btnWhatsWebClick());
@@ -99,6 +102,11 @@ public class MainActivity extends AppCompatActivity {
         this.linearWPEmojis.setOnClickListener(new btnWpEmojiListner());
         this.linearWPCaptionStatus.setOnClickListener(new btnWpCaptionStatusListner());
         this.linearWPTextRepeter.setOnClickListener(new btnWpTextRepeterLitstner());
+        this.linearScreenLimit.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                MainActivity.this.startActivity(new Intent(MainActivity.this, ScreenLimitSettingsActivity.class));
+            }
+        });
 
         //Fake Chat Method
         this.linearWPFakeChat.setOnClickListener(new OnClickListener() {

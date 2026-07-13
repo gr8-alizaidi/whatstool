@@ -4,10 +4,12 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.content.ComponentName;
 import android.content.Context;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,8 @@ import android.view.WindowManager.LayoutParams;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.whatstools.R;
+import com.whatstools.screenlimit.ScreenLimitManager;
+import com.whatstools.screenlimit.WhatsAppLimitBlockActivity;
 
 public class BasicAccessibilityService extends AccessibilityService {
     public static Context context;
@@ -26,10 +30,15 @@ public class BasicAccessibilityService extends AccessibilityService {
     private LayoutParams layoutParams;
     private View view1;
     private WindowManager windowManager;
+    private String lastPackageName;
+    private long whatsappSessionStart;
+    private SharedPreferences sharedPreferences;
 
     @SuppressLint({"ClickableViewAccessibility"})
     public void onServiceConnected() {
         this.windowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        this.sharedPreferences = ScreenLimitManager.prefs(this);
+        ScreenLimitManager.resetIfNewDay(this.sharedPreferences);
         this.accessibilityServiceInfo.eventTypes = -1;
         this.accessibilityServiceInfo.feedbackType = 16;
         this.accessibilityServiceInfo.notificationTimeout = 100;
@@ -47,6 +56,29 @@ public class BasicAccessibilityService extends AccessibilityService {
         accessibilityServiceInfo.feedbackType = 16;
         accessibilityServiceInfo.flags = 2;
         setServiceInfo(accessibilityServiceInfo);
+    }
+
+    private void maybeStartBlocker() {
+        if (!ScreenLimitManager.isEnabled(this.sharedPreferences)) {
+            return;
+        }
+        if (!ScreenLimitManager.isBlocked(this.sharedPreferences)) {
+            ScreenLimitManager.setBlocked(this.sharedPreferences, true);
+        }
+        Intent intent = new Intent(this, WhatsAppLimitBlockActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    private boolean isWhatsAppPackage(String packageName) {
+        return "com.whatsapp".equals(packageName) || "com.whatsapp.w4b".equals(packageName);
+    }
+
+    private void stopTrackingWhatsAppSession(long now) {
+        if (this.whatsappSessionStart > 0) {
+            ScreenLimitManager.addUsage(this.sharedPreferences, now - this.whatsappSessionStart);
+            this.whatsappSessionStart = 0;
+        }
     }
 
     private ActivityInfo m18198a(ComponentName componentName) {
@@ -69,7 +101,26 @@ public class BasicAccessibilityService extends AccessibilityService {
                 if (obj == null) {
                     return;
                 }
-                if (componentName.getPackageName().equals("com.whatsapp")) {
+                String packageName = componentName.getPackageName();
+                long now = System.currentTimeMillis();
+                if (this.lastPackageName != null && !this.lastPackageName.equals(packageName) && !isWhatsAppPackage(packageName)) {
+                    stopTrackingWhatsAppSession(now);
+                }
+                this.lastPackageName = packageName;
+                if (isWhatsAppPackage(packageName)) {
+                    if (ScreenLimitManager.isBlocked(this.sharedPreferences)) {
+                        maybeStartBlocker();
+                        return;
+                    }
+                    long limitMillis = ScreenLimitManager.getLimitMillis(this.sharedPreferences);
+                    long usedMillis = ScreenLimitManager.getTodayUsageMillis(this.sharedPreferences);
+                    if (ScreenLimitManager.isEnabled(this.sharedPreferences) && limitMillis > 0 && usedMillis >= limitMillis) {
+                        maybeStartBlocker();
+                        return;
+                    }
+                    if (this.whatsappSessionStart == 0) {
+                        this.whatsappSessionStart = now;
+                    }
                     if (WalkMainActivity.isWalk) {
                         view = CameraOverlay.methOverlayCheck(this);
                         if (view != null) {
@@ -77,6 +128,7 @@ public class BasicAccessibilityService extends AccessibilityService {
                         }
                     }
                 } else if (view != null) {
+                    stopTrackingWhatsAppSession(now);
                     CameraOverlay.methWinManager();
                 }
             }
@@ -86,5 +138,10 @@ public class BasicAccessibilityService extends AccessibilityService {
 
     public void onInterrupt() {
         Log.e("Service", "Interupted");
+    }
+
+    public void onDestroy() {
+        stopTrackingWhatsAppSession(System.currentTimeMillis());
+        super.onDestroy();
     }
 }

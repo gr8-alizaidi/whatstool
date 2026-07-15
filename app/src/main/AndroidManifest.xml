@@ -81,6 +81,11 @@
             android:theme="@style/MyMaterialTheme"
              />
         <activity
+            android:name="com.whatstools.walkChat.WalkChatLimitBlockActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme1" />
+        <activity
             android:name="com.whatstools.shakeShortcut.ShakeMain"
             android:exported="true"
             android:screenOrientation="portrait"

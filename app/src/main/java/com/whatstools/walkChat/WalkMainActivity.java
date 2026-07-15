@@ -53,10 +53,12 @@ public class WalkMainActivity extends AppCompatActivity {
         public void onClick(View v) {
             if (WalkMainActivity.isWalk) {
                 WalkMainActivity.isWalk = false;
+                WalkChatTimerManager.stopTimer(WalkMainActivity.this);
                 WalkMainActivity.this.BtnWalk.setImageResource(R.drawable.offs);
                 return;
             }
             WalkMainActivity.isWalk = true;
+            WalkChatTimerManager.startTimer(WalkMainActivity.this);
             WalkMainActivity.this.BtnWalk.setImageResource(R.drawable.ons);
         }
     }
@@ -107,7 +109,20 @@ public class WalkMainActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
+        if (WalkMainActivity.isWalk) {
+            WalkMainActivity.isWalk = false;
+            WalkChatTimerManager.stopTimer(this);
+        }
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (WalkMainActivity.isWalk) {
+            WalkMainActivity.isWalk = false;
+            WalkChatTimerManager.stopTimer(this);
+        }
+        super.onDestroy();
     }
 }

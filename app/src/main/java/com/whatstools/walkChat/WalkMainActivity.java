@@ -1,5 +1,6 @@
 package com.whatstools.walkChat;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,7 @@ public class WalkMainActivity extends AppCompatActivity {
     RelativeLayout Back;
     ImageView BtnWalk;
     RelativeLayout OpenWhatsApp;
+    private WalkChatSessionManager.WalkSessionCallback sessionCallback;
 
 
 
@@ -54,16 +56,24 @@ public class WalkMainActivity extends AppCompatActivity {
             if (WalkMainActivity.isWalk) {
                 WalkMainActivity.isWalk = false;
                 WalkMainActivity.this.BtnWalk.setImageResource(R.drawable.offs);
+                WalkChatSessionManager.stopSession(WalkMainActivity.this);
                 return;
             }
             WalkMainActivity.isWalk = true;
             WalkMainActivity.this.BtnWalk.setImageResource(R.drawable.ons);
+            WalkChatSessionManager.startSession(WalkMainActivity.this, sessionCallback);
         }
     }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_walk);
+
+        sessionCallback = () -> {
+            isWalk = false;
+            BtnWalk.setImageResource(R.drawable.offs);
+            showSessionExpiredDialog();
+        };
 
         if (!Internetconnection.checkConnection(this)) {
             Mrec banner = findViewById(R.id.startAppBanner);
@@ -106,8 +116,22 @@ public class WalkMainActivity extends AppCompatActivity {
         return false;
     }
 
+    private void showSessionExpiredDialog() {
+        new AlertDialog.Builder(this)
+            .setTitle("Walk and Chat Session Ended")
+            .setMessage("Your 15-minute Walk and Chat session has ended for your safety.")
+            .setPositiveButton("OK", (dialog, which) -> {
+                dialog.dismiss();
+            })
+            .setCancelable(false)
+            .show();
+    }
+
     public void onBackPressed() {
         super.onBackPressed();
+        if (isWalk) {
+            WalkChatSessionManager.stopSession(this);
+        }
         finish();
     }
 }

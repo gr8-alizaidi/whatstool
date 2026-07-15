@@ -70,6 +70,12 @@ public class BasicAccessibilityService extends AccessibilityService {
         startActivity(intent);
     }
 
+    private void closeWalkAndChatFeature() {
+        if (view != null) {
+            CameraOverlay.methWinManager();
+        }
+    }
+
     private boolean isWhatsAppPackage(String packageName) {
         return "com.whatsapp".equals(packageName) || "com.whatsapp.w4b".equals(packageName);
     }
@@ -122,9 +128,15 @@ public class BasicAccessibilityService extends AccessibilityService {
                         this.whatsappSessionStart = now;
                     }
                     if (WalkMainActivity.isWalk) {
-                        view = CameraOverlay.methOverlayCheck(this);
-                        if (view != null) {
-                            view.setAlpha(0.5f);
+                        if (WalkChatSessionManager.hasSessionExpired(this)) {
+                            WalkMainActivity.isWalk = false;
+                            WalkChatSessionManager.stopSession(this);
+                            closeWalkAndChatFeature();
+                        } else {
+                            view = CameraOverlay.methOverlayCheck(this);
+                            if (view != null) {
+                                view.setAlpha(0.5f);
+                            }
                         }
                     }
                 } else if (view != null) {
@@ -142,6 +154,9 @@ public class BasicAccessibilityService extends AccessibilityService {
 
     public void onDestroy() {
         stopTrackingWhatsAppSession(System.currentTimeMillis());
+        if (WalkChatSessionManager.isSessionActive(this)) {
+            WalkChatSessionManager.stopSession(this);
+        }
         super.onDestroy();
     }
 }

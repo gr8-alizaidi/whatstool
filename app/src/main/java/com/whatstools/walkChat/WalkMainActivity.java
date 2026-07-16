@@ -3,9 +3,11 @@ package com.whatstools.walkChat;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.text.TextUtils.SimpleStringSplitter;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -27,6 +30,9 @@ public class WalkMainActivity extends AppCompatActivity {
     RelativeLayout Back;
     ImageView BtnWalk;
     RelativeLayout OpenWhatsApp;
+    private CountDownTimer walkChatTimer;
+    private SharedPreferences sharedPreferences;
+    private TextView timerTextView;
 
 
 
@@ -54,16 +60,20 @@ public class WalkMainActivity extends AppCompatActivity {
             if (WalkMainActivity.isWalk) {
                 WalkMainActivity.isWalk = false;
                 WalkMainActivity.this.BtnWalk.setImageResource(R.drawable.offs);
+                stopWalkChatTimer();
                 return;
             }
             WalkMainActivity.isWalk = true;
             WalkMainActivity.this.BtnWalk.setImageResource(R.drawable.ons);
+            startWalkChatTimer();
         }
     }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_walk);
+
+        sharedPreferences = WalkChatLimitManager.prefs(this);
 
         if (!Internetconnection.checkConnection(this)) {
             Mrec banner = findViewById(R.id.startAppBanner);
@@ -87,6 +97,10 @@ public class WalkMainActivity extends AppCompatActivity {
         this.Back.setOnClickListener(new btnBackPressed());
         this.OpenWhatsApp.setOnClickListener(new btnOpenWhatsappListner());
         this.BtnWalk.setOnClickListener(new btnWalkListner());
+
+        if (isWalk && WalkChatLimitManager.isSessionActive(sharedPreferences)) {
+            startWalkChatTimer();
+        }
     }
 
     public static boolean accessibilityPermission(Context context, Class<?> cls) {
@@ -107,7 +121,48 @@ public class WalkMainActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
+        stopWalkChatTimer();
         super.onBackPressed();
         finish();
+    }
+
+    private void startWalkChatTimer() {
+        if (walkChatTimer != null) {
+            walkChatTimer.cancel();
+        }
+        WalkChatLimitManager.startSession(sharedPreferences);
+        long remainingMillis = WalkChatLimitManager.getRemainingTimeMillis(sharedPreferences);
+        walkChatTimer = new CountDownTimer(remainingMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (WalkChatLimitManager.isSessionLimitReached(sharedPreferences)) {
+                    closeWalkChatFeature();
+                    cancel();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                closeWalkChatFeature();
+            }
+        };
+        walkChatTimer.start();
+    }
+
+    private void stopWalkChatTimer() {
+        if (walkChatTimer != null) {
+            walkChatTimer.cancel();
+            walkChatTimer = null;
+        }
+        WalkChatLimitManager.endSession(sharedPreferences);
+    }
+
+    private void closeWalkChatFeature() {
+        if (walkChatTimer != null) {
+            walkChatTimer.cancel();
+        }
+        WalkMainActivity.isWalk = false;
+        BtnWalk.setImageResource(R.drawable.offs);
+        WalkChatLimitManager.endSession(sharedPreferences);
     }
 }

@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,12 +35,15 @@ public class BasicAccessibilityService extends AccessibilityService {
     private String lastPackageName;
     private long whatsappSessionStart;
     private SharedPreferences sharedPreferences;
+    private Handler walkChatTimerHandler;
+    private Runnable walkChatTimerRunnable;
 
     @SuppressLint({"ClickableViewAccessibility"})
     public void onServiceConnected() {
         this.windowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         this.sharedPreferences = ScreenLimitManager.prefs(this);
         ScreenLimitManager.resetIfNewDay(this.sharedPreferences);
+        this.walkChatTimerHandler = new Handler(Looper.getMainLooper());
         this.accessibilityServiceInfo.eventTypes = -1;
         this.accessibilityServiceInfo.feedbackType = 16;
         this.accessibilityServiceInfo.notificationTimeout = 100;
@@ -56,6 +61,7 @@ public class BasicAccessibilityService extends AccessibilityService {
         accessibilityServiceInfo.feedbackType = 16;
         accessibilityServiceInfo.flags = 2;
         setServiceInfo(accessibilityServiceInfo);
+        startWalkChatTimerMonitor();
     }
 
     private void maybeStartBlocker() {
@@ -136,12 +142,44 @@ public class BasicAccessibilityService extends AccessibilityService {
         }
     }
 
+    private void startWalkChatTimerMonitor() {
+        if (this.walkChatTimerRunnable == null) {
+            this.walkChatTimerRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (WalkChatTimerManager.isWalkChatActive(BasicAccessibilityService.this.sharedPreferences)) {
+                        if (WalkChatTimerManager.hasExceededLimit(BasicAccessibilityService.this.sharedPreferences)) {
+                            forceCloseWalkChat();
+                        } else {
+                            BasicAccessibilityService.this.walkChatTimerHandler.postDelayed(this, 5000);
+                        }
+                    } else {
+                        BasicAccessibilityService.this.walkChatTimerHandler.postDelayed(this, 5000);
+                    }
+                }
+            };
+        }
+        this.walkChatTimerHandler.post(this.walkChatTimerRunnable);
+    }
+
+    private void forceCloseWalkChat() {
+        if (view != null) {
+            CameraOverlay.methWinManager();
+            view = null;
+        }
+        WalkMainActivity.isWalk = false;
+        WalkChatTimerManager.stopSession(this.sharedPreferences);
+    }
+
     public void onInterrupt() {
         Log.e("Service", "Interupted");
     }
 
     public void onDestroy() {
         stopTrackingWhatsAppSession(System.currentTimeMillis());
+        if (this.walkChatTimerHandler != null && this.walkChatTimerRunnable != null) {
+            this.walkChatTimerHandler.removeCallbacks(this.walkChatTimerRunnable);
+        }
         super.onDestroy();
     }
 }

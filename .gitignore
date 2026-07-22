@@ -15,3 +15,5 @@
 
 # Decispher session buffer (local only)
 .decispher/.session/
+# Decispher memory identity (non-secret, local only)
+.decispher/user-identity.txt

@@ -30,6 +30,22 @@
 
 ---
 
+<!-- DECISION-02447F82 -->
+## Decision: Use notification-based birthday reminders instead of WhatsApp auto-send
+
+**Status**: Active  
+**Date**: 2026-07-13  
+**Severity**: Critical
+
+**Files**:
+- `app/`
+
+### Context
+
+**Decision:** Birthday reminders will be implemented as in-app scheduling plus local notifications. We will not rely on WhatsApp native scheduled messaging or automated WhatsApp sending for this feature.
+
+---
+
 <!-- DECISION-E67B7433 -->
 ## Decision: Development ownership for Activity base class refactoring
 

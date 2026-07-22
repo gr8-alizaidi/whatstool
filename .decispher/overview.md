@@ -15,10 +15,11 @@ _No spine items — no CRITICAL units in the corpus yet._
 |-------|-------|------:|
 | `c/decispher-demo-mri2fy8z/screen-limit` | screen limit | 1 |
 | `c/decispher-demo-mri2fy8z/team-detail` | team detail | 3 |
-| `c/decispher-demo-mri2fy8z/whatstool-design-choice` | whatstool design choice | 3 |
+| `c/decispher-demo-mri2fy8z/whatstool-design-choice` | whatstool design choice | 4 |
 
 ## Recent changes
 
+- 2026-07-13 · Use notification-based birthday reminders instead of WhatsApp auto-send
 - 2026-07-13 · Apply app branding to all user action output layouts
 - 2026-07-13 · Manager assignment for the Activity revamp teams
 - 2026-07-13 · Testing ownership for post-revamp activity features

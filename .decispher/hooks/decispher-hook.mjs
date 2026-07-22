@@ -40,6 +40,11 @@ const MAX_DIFF_CHARS = 60_000;
 const MAX_PROMPT_CHARS = 16_000;
 const MAX_REASONING_SNIPPETS = 5;
 const MAX_EDIT_HISTORY_PER_FILE = 50;
+// RD (ADR-078, D7) — cap for the full-response reasoning provenance, applied
+// strictly AFTER redaction (slicing first can cut a secret mid-pattern and
+// leak the fragment). Mirrors MAX_REASONING_PROVENANCE_CHARS in
+// @decispher/common; keep the two in sync.
+const MAX_REASONING_PROVENANCE_CHARS = 64_000;
 
 // ── Redaction at source (mirror of the server-side SessionRedactor) ─────────
 
@@ -446,6 +451,99 @@ export function formatWarningContext(warnings) {
 // ── Transcript reasoning extraction (Stop hook) ──────────────────────────────
 
 /**
+ * Removes fenced code blocks (``` / ~~~) before any sentence work (RD-S2).
+ * Diffs are already first-class file_edit captures — code in a reasoning body
+ * is duplication and poisons "last 3 sentences". Line-scan with fence-state so
+ * nested backticks inside a block never confuse it; an unterminated fence
+ * drops the rest of the text (the code tail carries no sentence signal).
+ */
+export function stripCodeFences(text) {
+    const out = [];
+    let fence = null;
+    for (const line of text.split('\n')) {
+        const marker = /^\s*(`{3,}|~{3,})/.exec(line);
+        if (fence !== null) {
+            if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length) fence = null;
+            continue;
+        }
+        if (marker) { fence = marker[1]; continue; }
+        out.push(line);
+    }
+    return out.join('\n');
+}
+
+/**
+ * Trailing CTA/offer paragraphs ("If you want, I can next…", "Would you
+ * like…", "Let me know…") — the sign-off, not the substance. Deterministic
+ * and deliberately conservative: a false negative is the status quo, a false
+ * positive loses a sentence (RD-S2). Only the paragraph's LEAD line is
+ * matched, and only from the end of the message inward.
+ */
+const CLOSING_OFFER_PATTERNS = [
+    /^if you (want|like|prefer|need|would like|'d like)\b/i,
+    /^would you like\b/i,
+    /^do you want\b/i,
+    /^want me to\b/i,
+    /^let me know\b/i,
+    /^shall i\b/i,
+    /^i can (also|next|now|then)\b/i,
+    /^happy to\b/i,
+    /^just say the word\b/i,
+];
+
+function isOfferLead(paragraph) {
+    const lead = paragraph.split('\n')[0]?.trim() ?? '';
+    return CLOSING_OFFER_PATTERNS.some((re) => re.test(lead));
+}
+
+function isListParagraph(paragraph) {
+    const lines = paragraph.split('\n').map((l) => l.trim()).filter(Boolean);
+    return lines.length > 0 && lines.every((l) => /^(\d+[.)]|[-*+•])\s/.test(l));
+}
+
+export function stripClosingOffers(text) {
+    const paragraphs = text.split(/\n{2,}/);
+    while (paragraphs.length > 0) {
+        const last = paragraphs[paragraphs.length - 1].trim();
+        if (!last) { paragraphs.pop(); continue; }
+        if (isOfferLead(last)) { paragraphs.pop(); continue; }
+        // A numbered next-step list only reads as an offer when an offer
+        // paragraph introduces it — drop the pair, never a bare list.
+        if (isListParagraph(last) && paragraphs.length >= 2
+            && isOfferLead(paragraphs[paragraphs.length - 2].trim())) {
+            paragraphs.pop();
+            continue;
+        }
+        break;
+    }
+    return paragraphs.join('\n\n').trim();
+}
+
+/**
+ * When the message carries markdown structure (≥2 headings), the substance is
+ * the section map, not the closing sentences — build the tail from each
+ * heading plus its lead sentence. Null when the message has no such structure.
+ */
+function extractStructuredTail(text) {
+    const lines = text.split('\n');
+    const sections = [];
+    for (let i = 0; i < lines.length; i += 1) {
+        const heading = /^\s*#{1,6}\s+(.+?)\s*$/.exec(lines[i]);
+        if (!heading) continue;
+        let lead = '';
+        for (let j = i + 1; j < lines.length; j += 1) {
+            if (/^\s*#{1,6}\s+/.test(lines[j])) break;
+            const t = lines[j].trim().replace(/^([-*+•]|\d+[.)])\s+/, '');
+            if (t) { lead = t; break; }
+        }
+        const sentence = lead.split(/(?<=[.!?])\s+/)[0]?.trim() ?? '';
+        sections.push(sentence ? `${heading[1]}: ${sentence}` : heading[1]);
+    }
+    if (sections.length < 2) return null;
+    return sections.join(' · ');
+}
+
+/**
  * Pulls the closing sentences of the most recent assistant thinking blocks —
  * the justification, not the exploration. The rest of the transcript is
  * discarded (ADR-052: snippets only, never full transcripts).
@@ -466,7 +564,7 @@ export function extractReasoningSnippets(jsonlText) {
     }
     const snippets = [];
     for (const block of blocks.slice(-MAX_REASONING_SNIPPETS)) {
-        const sentences = block.replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+/);
+        const sentences = stripCodeFences(block).replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+/);
         const tail = sentences.slice(-3).join(' ').trim();
         if (tail.length >= 40) snippets.push(tail.slice(0, 1500));
     }
@@ -1037,29 +1135,47 @@ export async function handleCodexPostTool(ctx, input) {
 }
 
 /**
- * Codex Stop fires at every turn end (there is no SessionEnd). Stage the tail
- * of the final assistant message as a reasoning snippet — the documented
+ * Codex Stop fires at every turn end (there is no SessionEnd). Stage the smart
+ * snippet of the final assistant message — the documented
  * `last_assistant_message` field, stable across Codex versions, unlike the
  * undocumented rollout transcript format — then flush.
+ *
+ * RD-S2 deterministic floor: strip fences → strip closing offers → prefer the
+ * heading/lead-sentence map when the message has markdown sections, else the
+ * last 3 sentences. The 40-char floor and 1500 cap are unchanged. A message
+ * that was ALL sign-off strips to nothing and stages no event.
  */
 export function extractMessageTail(text) {
-    const sentences = text.replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+/);
-    const tail = sentences.slice(-3).join(' ').trim();
+    const stripped = stripClosingOffers(stripCodeFences(text));
+    const structured = extractStructuredTail(stripped);
+    const tail = structured ?? stripped.replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+/).slice(-3).join(' ').trim();
     return tail.length >= 40 ? tail.slice(0, 1500) : null;
+}
+
+/**
+ * RD (ADR-078, D1) — the two-layer reasoning event for final-message agents:
+ * `body` is the deterministic smart snippet (the durable spine everyone gets),
+ * `reasoning` is the FULL redacted message as encrypted, purge-windowed
+ * provenance so distillation stays possible any time later. Redact-then-
+ * truncate, never the reverse (D7).
+ */
+function buildFinalMessageReasoningEvent(ctx, cwd, sessionId, message) {
+    const tail = extractMessageTail(message);
+    if (!tail) return null;
+    return buildEvent(ctx, 'reasoning', cwd, {
+        sessionId,
+        toolUseId: `reasoning:${hashId(sessionId, tail)}`,
+        body: redactText(tail),
+        reasoning: redactText(message).slice(0, MAX_REASONING_PROVENANCE_CHARS),
+    });
 }
 
 export async function handleCodexStop(ctx, input) {
     const events = [];
     if (!isCapturePaused() && typeof input.last_assistant_message === 'string') {
         const sessionId = input.session_id ?? 'unknown-session';
-        const tail = extractMessageTail(input.last_assistant_message);
-        if (tail) {
-            events.push(buildEvent(ctx, 'reasoning', input.cwd, {
-                sessionId,
-                toolUseId: `reasoning:${hashId(sessionId, tail)}`,
-                reasoning: redactText(tail),
-            }));
-        }
+        const event = buildFinalMessageReasoningEvent(ctx, input.cwd, sessionId, input.last_assistant_message);
+        if (event) events.push(event);
     }
     await enqueueEvents(ctx, events);
     await flushBuffer(ctx);
@@ -1176,20 +1292,15 @@ export async function handleGrokPostTool(ctx, input) {
  * Grok Stop fires at turn end (SessionEnd covers the session boundary).
  * Stage a reasoning snippet when the payload exposes the final assistant
  * message under the Codex-style field, then flush — tolerant: absent field
- * just means flush-only.
+ * just means flush-only. Same RD-S2 two-layer event as Codex (body = smart
+ * snippet, reasoning = full redacted message as provenance).
  */
 export async function handleGrokStop(ctx, input) {
     const events = [];
     if (!isCapturePaused() && typeof input.last_assistant_message === 'string') {
         const sessionId = input.session_id ?? 'unknown-session';
-        const tail = extractMessageTail(input.last_assistant_message);
-        if (tail) {
-            events.push(buildEvent(ctx, 'reasoning', input.cwd, {
-                sessionId,
-                toolUseId: `reasoning:${hashId(sessionId, tail)}`,
-                reasoning: redactText(tail),
-            }));
-        }
+        const event = buildFinalMessageReasoningEvent(ctx, input.cwd, sessionId, input.last_assistant_message);
+        if (event) events.push(event);
     }
     await enqueueEvents(ctx, events);
     await flushBuffer(ctx);

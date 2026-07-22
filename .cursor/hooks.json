@@ -1,0 +1,25 @@
+{
+    "version": 1,
+    "hooks": {
+        "sessionStart": [
+            {
+                "command": "node .decispher/hooks/decispher-hook.mjs cursor-session-start"
+            }
+        ],
+        "afterFileEdit": [
+            {
+                "command": "node .decispher/hooks/decispher-hook.mjs cursor-after-edit"
+            }
+        ],
+        "beforeShellExecution": [
+            {
+                "command": "node .decispher/hooks/decispher-hook.mjs cursor-before-shell"
+            }
+        ],
+        "stop": [
+            {
+                "command": "node .decispher/hooks/decispher-hook.mjs cursor-stop"
+            }
+        ]
+    }
+}

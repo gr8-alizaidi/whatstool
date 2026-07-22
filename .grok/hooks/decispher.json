@@ -1,0 +1,60 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs grok-session-start",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs grok-user-prompt",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Bash|Edit|Write|run_terminal_cmd|search_replace|write_file|create_file",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs grok-post-tool",
+                        "timeout": 15
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs grok-stop",
+                        "timeout": 30
+                    }
+                ]
+            }
+        ],
+        "SessionEnd": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node .decispher/hooks/decispher-hook.mjs grok-session-end",
+                        "timeout": 15
+                    }
+                ]
+            }
+        ]
+    }
+}

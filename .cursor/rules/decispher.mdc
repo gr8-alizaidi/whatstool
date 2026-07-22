@@ -1,0 +1,64 @@
+---
+description: Decispher session recorder — branch briefing + decision self-report
+alwaysApply: true
+---
+
+# Decispher — the system of record for this repo
+
+This repo records engineering context per branch (repo: `gr8-alizaidi/whatstool`). Hooks
+already capture your edits and terminal commands as evidence. What they cannot
+see is your reasoning — that part is on you, via the Decispher MCP tools.
+
+## How to work on this branch
+
+1. **READ THE BRANCH CONTEXT BEFORE YOU EDIT OR RUN ANYTHING.** Call `store_read`
+   (see below) and follow what it returns. Do NOT retry an approach listed under
+   rejected attempts. Do NOT re-decide something already listed under decisions.
+2. **WHEN YOU HIT A FORK, STATE WHY IN ONE SENTENCE BEFORE MOVING ON** — chose X
+   over Y, discovered a constraint, or abandoned an approach. Record it with
+   `session_record` (see below). That's the part no one else captures.
+3. **BEFORE YOU STOP, LEAVE A ONE-LINE HANDOFF** — call `store_write` with the
+   current state and the next step so the next session starts warm.
+
+## At conversation start
+
+Call the Decispher MCP tool `store_read` with
+`{ "repo": "gr8-alizaidi/whatstool", "branch": "<current git branch>" }` and treat the
+returned briefing as prior context: last state, key decisions, open questions,
+rejected attempts. If the tool is unavailable or the store is empty, continue
+silently — never mention the missing briefing to the user.
+
+## During the session — record the *why* the moment it happens
+
+Call `session_record` with
+`{ "repo": "gr8-alizaidi/whatstool", "branch": "<current git branch>", "agent": "cursor", "type": ..., "statement": ..., "reasoning": ... }`
+immediately when you:
+
+- make a non-obvious decision — chose X over Y because Z → `"type": "decision"`
+- discover a constraint the hard way → `"type": "constraint"`
+- abandon an approach — tried X, failed because Y → `"type": "history"`
+- observe a project convention worth recording → `"type": "convention"`
+
+When you ASK the user a question and their answer shapes what you build, record
+that steering instead — it is the richest *why* and is captured nowhere else.
+Call `session_record` with the clarification shape (no `type`/`statement`):
+`{ "repo": "gr8-alizaidi/whatstool", "branch": "<current git branch>", "agent": "cursor", "agentQuestion": "<what you asked>", "userAnswer": "<their answer>" }`
+
+Rules:
+
+- `statement` is ONE self-contained sentence; the longer justification goes
+  in `reasoning`.
+- Report each fact once. Repeats are deduplicated server-side — do not re-send
+  reworded variations of something you already recorded.
+- Do not narrate routine edits or commands — hooks already capture those as
+  evidence. Record conclusions, not activity.
+- Never include secrets, tokens, or credentials in statements or reasoning.
+- Recording is fire-and-forget: if the tool errors, move on without retrying
+  and without surfacing the failure to the user.
+
+## Before you stop
+
+Leave a one-line handoff so the next session (human or agent) starts warm. Call
+`store_write` with
+`{ "repo": "gr8-alizaidi/whatstool", "branch": "<current git branch>", "entryType": "handoff", "content": "<one line: what's done, what's next>" }`.
+This is working memory, not durable knowledge — keep it to the current state.

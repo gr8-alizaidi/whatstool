@@ -1,6 +1,6 @@
 {
   "schema": "decispher-context-map/v1",
-  "generatedAt": "2026-07-13T05:10:26.768Z",
+  "generatedAt": "2026-07-22T11:56:03.640Z",
   "project": {
     "id": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
     "name": "Demo"
@@ -36,9 +36,9 @@
       "id": "c/decispher-demo-mri2fy8z/whatstool-design-choice",
       "label": "whatstool design choice",
       "description": "This topic covers all the design choice we made for our app",
-      "unitCount": 3,
+      "unitCount": 4,
       "spineUnitCount": 0,
-      "expansionUnitCount": 3,
+      "expansionUnitCount": 4,
       "tokensInStub": 0,
       "stubPath": ".decispher/topics/c/decispher-demo-mri2fy8z/whatstool-design-choice.md",
       "mcpTool": "decispher.get_context_for_topic"

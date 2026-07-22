@@ -1,15 +1,15 @@
 {
   "$schema": "https://decispher.com/schemas/context-rules/v1.json",
   "specVersion": "2.0.0",
-  "generatedAt": "2026-07-13T05:10:26.768Z",
+  "generatedAt": "2026-07-22T11:56:03.640Z",
   "companyId": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16",
   "projectId": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
   "meta": {
-    "totalRules": 7,
+    "totalRules": 8,
     "rulesByType": {
       "decision": 3,
       "convention": 1,
-      "constraint": 0,
+      "constraint": 1,
       "rationale": 0,
       "ownership": 3,
       "history": 0,
@@ -17,7 +17,7 @@
     },
     "rulesBySeverity": {
       "CRITICAL": 0,
-      "HIGH": 1,
+      "HIGH": 2,
       "MEDIUM": 4,
       "LOW": 2
     },
@@ -51,6 +51,24 @@
         "exemptPatterns": []
       },
       "mcpFetch": "decispher.get_decision({ decisionId: \"fe011105-94d5-436a-8878-4c58d6e0b4f2\" })"
+    },
+    {
+      "id": "02447f82-956e-4249-b2a9-5f3f0db98ac1",
+      "type": "constraint",
+      "title": "Use notification-based birthday reminders instead of WhatsApp auto-send",
+      "severity": "HIGH",
+      "status": "active",
+      "affectedFiles": [
+        "app/"
+      ],
+      "tags": [
+        "birthday-reminder",
+        "notifications",
+        "whatsapp"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"02447f82-956e-4249-b2a9-5f3f0db98ac1\" })"
     },
     {
       "id": "e67b7433-0570-4d78-862d-bd8e9db0f0bb",

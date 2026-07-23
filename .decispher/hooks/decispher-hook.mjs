@@ -38,7 +38,6 @@ const MAX_BUFFERED_EVENTS = 500;
 const MAX_TERMINAL_OUTPUT_CHARS = 16_000;
 const MAX_DIFF_CHARS = 60_000;
 const MAX_PROMPT_CHARS = 16_000;
-const MAX_REASONING_SNIPPETS = 5;
 const MAX_EDIT_HISTORY_PER_FILE = 50;
 // RD (ADR-078, D7) — cap for the full-response reasoning provenance, applied
 // strictly AFTER redaction (slicing first can cut a secret mid-pattern and
@@ -544,31 +543,83 @@ function extractStructuredTail(text) {
 }
 
 /**
- * Pulls the closing sentences of the most recent assistant thinking blocks —
- * the justification, not the exploration. The rest of the transcript is
- * discarded (ADR-052: snippets only, never full transcripts).
+ * Per-session transcript cursor (ADR-078 amendment, Fix 3b). The Claude Code
+ * transcript file is cumulative — it holds the entire session and is re-read
+ * at every Stop. The cursor records how many lines were already processed so
+ * each Stop reads only ITS turn: complete per-turn thinking with no arbitrary
+ * block cap, bounded volume, and no redundant whole-file re-processing.
  */
-export function extractReasoningSnippets(jsonlText) {
-    const blocks = [];
-    for (const line of jsonlText.split('\n')) {
+function transcriptCursorPath(ctx, sessionId) {
+    return path.join(ctx.sessionDir, `transcript-${hashId(sessionId)}.json`);
+}
+
+export function loadTranscriptCursor(ctx, sessionId) {
+    try {
+        const parsed = JSON.parse(fs.readFileSync(transcriptCursorPath(ctx, sessionId), 'utf8'));
+        return Number.isInteger(parsed.line) && parsed.line >= 0 ? parsed.line : 0;
+    } catch {
+        return 0;
+    }
+}
+
+export function saveTranscriptCursor(ctx, sessionId, line) {
+    fs.mkdirSync(ctx.sessionDir, { recursive: true });
+    fs.writeFileSync(transcriptCursorPath(ctx, sessionId), JSON.stringify({ line }));
+}
+
+/**
+ * Reads one turn out of the cumulative transcript: every assistant thinking
+ * block after `fromLine`, plus the text blocks of the turn's last assistant
+ * message. Returns `{ thinking, finalMessage, lineCount }`; `lineCount` is the
+ * new cursor. A transcript shorter than the cursor (rotated/truncated file)
+ * resets to a full read rather than silently losing the turn.
+ */
+export function extractTurn(jsonlText, fromLine = 0) {
+    const lines = jsonlText.split('\n');
+    const start = fromLine > lines.length ? 0 : fromLine;
+    const thinkingBlocks = [];
+    let finalMessage = null;
+    for (let i = start; i < lines.length; i += 1) {
+        const line = lines[i];
         if (!line.trim()) continue;
         let entry;
         try { entry = JSON.parse(line); } catch { continue; }
         const content = entry?.message?.content;
         if (entry?.type !== 'assistant' || !Array.isArray(content)) continue;
+        const texts = [];
         for (const block of content) {
             if (block?.type === 'thinking' && typeof block.thinking === 'string') {
-                blocks.push(block.thinking);
+                thinkingBlocks.push(block.thinking);
+            } else if (block?.type === 'text' && typeof block.text === 'string') {
+                texts.push(block.text);
             }
         }
+        // The turn's final message is the LAST assistant entry carrying text.
+        if (texts.length > 0) finalMessage = texts.join('\n\n');
     }
-    const snippets = [];
-    for (const block of blocks.slice(-MAX_REASONING_SNIPPETS)) {
-        const sentences = stripCodeFences(block).replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+/);
-        const tail = sentences.slice(-3).join(' ').trim();
-        if (tail.length >= 40) snippets.push(tail.slice(0, 1500));
-    }
-    return snippets;
+    return {
+        thinking: thinkingBlocks.length > 0 ? thinkingBlocks.join('\n\n') : null,
+        finalMessage,
+        // The cursor counts only newline-terminated lines. A file ending in
+        // '\n' splits into a phantom trailing '' — counting it would shift the
+        // cursor one past the last real line and silently drop the first entry
+        // of every subsequent turn.
+        lineCount: jsonlText.endsWith('\n') ? lines.length - 1 : lines.length,
+    };
+}
+
+/**
+ * Deterministic snippet over one turn's complete thinking — the durable spine
+ * (RD-S2 floor rules: strip fences, prefer the heading map, else the last 3
+ * sentences; 40-char floor, 1500 cap). Thinking ENDS with its conclusions, so
+ * the tail is the right sample.
+ */
+export function extractThinkingSnippet(text) {
+    const stripped = stripCodeFences(text);
+    const structured = extractStructuredTail(stripped);
+    const tail = structured
+        ?? stripped.replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+/).slice(-3).join(' ').trim();
+    return tail.length >= 40 ? tail.slice(0, 1500) : null;
 }
 
 // ── Recording light (statusline) ─────────────────────────────────────────────
@@ -875,19 +926,44 @@ export function stageClarifications(ctx, sessionId, cwd, baseId, toolInput, tool
     return events;
 }
 
+/**
+ * Claude Code Stop — the two-layer treatment Codex already gets (Fix 3 + 3b).
+ * The transcript cursor bounds the read to THIS turn; from it we stage:
+ *
+ *   1. The turn's COMPLETE thinking (no block cap) — `body` is the
+ *      deterministic snippet, `reasoning` the full redacted thinking as 64k
+ *      encrypted provenance. Thinking holds the roads not taken.
+ *   2. The turn's final assistant message — the same two-layer event Codex
+ *      emits (`extractMessageTail` body + full redacted message provenance).
+ *
+ * Separate content-hashed toolUseIds, so the two never collide and re-sends
+ * dedup server-side. Redact-then-truncate, never the reverse (D7).
+ */
 export async function handleStop(ctx, input) {
     const sessionId = input.session_id ?? 'unknown-session';
     const events = [];
     if (!isCapturePaused() && typeof input.transcript_path === 'string' && fs.existsSync(input.transcript_path)) {
         try {
             const transcript = fs.readFileSync(input.transcript_path, 'utf8');
-            for (const snippet of extractReasoningSnippets(transcript)) {
-                events.push(buildEvent(ctx, 'reasoning', input.cwd, {
-                    sessionId,
-                    toolUseId: `reasoning:${hashId(sessionId, snippet)}`,
-                    reasoning: redactText(snippet),
-                }));
+            const cursor = loadTranscriptCursor(ctx, sessionId);
+            const turn = extractTurn(transcript, cursor);
+
+            if (turn.thinking) {
+                const snippet = extractThinkingSnippet(turn.thinking);
+                if (snippet) {
+                    events.push(buildEvent(ctx, 'reasoning', input.cwd, {
+                        sessionId,
+                        toolUseId: `reasoning:${hashId(sessionId, 'thinking', turn.thinking)}`,
+                        body: redactText(snippet),
+                        reasoning: redactText(turn.thinking).slice(0, MAX_REASONING_PROVENANCE_CHARS),
+                    }));
+                }
             }
+            if (turn.finalMessage) {
+                const event = buildFinalMessageReasoningEvent(ctx, input.cwd, sessionId, turn.finalMessage);
+                if (event) events.push(event);
+            }
+            try { saveTranscriptCursor(ctx, sessionId, turn.lineCount); } catch { /* cursor is best-effort */ }
         } catch { /* transcript unreadable — skip, never block */ }
     }
     await enqueueEvents(ctx, events);

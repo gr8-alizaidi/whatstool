@@ -165,7 +165,9 @@ public class SavedVideoPlayer extends AppCompatActivity implements OnClickListen
         Intent shareIntent = new Intent();
         shareIntent.setAction("android.intent.action.SEND");
         shareIntent.putExtra("android.intent.extra.STREAM", imageConvertToUri);
+        // App branding on shared output (team convention)
+        shareIntent.putExtra("android.intent.extra.TEXT", "Shared via WhatsTools");
         shareIntent.setType("video/*");
-        startActivity(Intent.createChooser(shareIntent, "Share Image"));
+        startActivity(Intent.createChooser(shareIntent, "Share Video"));
     }
 }

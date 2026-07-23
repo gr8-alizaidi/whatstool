@@ -156,7 +156,7 @@ public class SavedImageViewer extends AppCompatActivity implements ViewPager.OnP
 
     private void DeleteActivity() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        alertDialog.setMessage("Are you sure to delete the Video from your device's local storage?");
+        alertDialog.setMessage("Are you sure to delete the Image from your device's local storage?");
         alertDialog.setPositiveButton("YES", new btnDialogYesListner());
         alertDialog.setNegativeButton("NO", new btnDialogNoListner());
         alertDialog.show();
@@ -196,6 +196,8 @@ public class SavedImageViewer extends AppCompatActivity implements ViewPager.OnP
         Intent shareIntent = new Intent();
         shareIntent.setAction("android.intent.action.SEND");
         shareIntent.putExtra("android.intent.extra.STREAM", imageConvertToUri);
+        // App branding on shared output (team convention)
+        shareIntent.putExtra("android.intent.extra.TEXT", "Shared via WhatsTools");
         shareIntent.setType("image/*");
         startActivity(Intent.createChooser(shareIntent, "Share Image"));
         AdsCount();

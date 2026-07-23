@@ -2,14 +2,20 @@ package com.whatstools.statusSaver;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.startapp.android.publish.ads.banner.Mrec;
@@ -17,7 +23,11 @@ import com.startapp.android.publish.adsCommon.StartAppAd;
 import com.whatstools.Internetconnection;
 import com.whatstools.R;
 
+import java.util.ArrayList;
+
 public class StatusSaverMainActivity extends AppCompatActivity implements OnClickListener {
+    private static final int REQUEST_STORAGE = 100;
+
     ImageView recent_stories;
     ImageView saved_stories;
 
@@ -27,7 +37,7 @@ public class StatusSaverMainActivity extends AppCompatActivity implements OnClic
         setContentView(R.layout.activity_main_statussaver);
         getSupportActionBar().setTitle("Status Saver");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getPermission();
+        requestStoragePermissionIfNeeded();
         if (!Internetconnection.checkConnection(this)) {
             Mrec banner = findViewById(R.id.startAppBanner);
             banner.hideBanner();
@@ -38,9 +48,64 @@ public class StatusSaverMainActivity extends AppCompatActivity implements OnClic
         this.saved_stories.setOnClickListener(this);
     }
 
-    private void getPermission() {
-        if (!(ContextCompat.checkSelfPermission(this, "android.permission.CAMERA") == 0 && ContextCompat.checkSelfPermission(this, "android.permission.WRITE_EXTERNAL_STORAGE") == 0 && ContextCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") == 0 && ContextCompat.checkSelfPermission(this, "android.permission.ACCESS_NETWORK_STATE") == 0 && ContextCompat.checkSelfPermission(this, "android.permission.SET_WALLPAPER") == 0 && ContextCompat.checkSelfPermission(this, "android.permission.INTERNET") == 0 && ContextCompat.checkSelfPermission(this, "android.permission.SYSTEM_ALERT_WINDOW") == 0) && VERSION.SDK_INT >= 23) {
-            requestPermissions(new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.ACCESS_NETWORK_STATE", "android.permission.SET_WALLPAPER", "android.permission.INTERNET", "android.permission.SYSTEM_ALERT_WINDOW"}, 0);
+    /**
+     * The status saver only needs storage access. READ_EXTERNAL_STORAGE covers
+     * every OS version while we target API 30 (on Android 13+ the system maps
+     * it to the granular media permissions); WRITE is only meaningful up to
+     * Android 9 — from Q onward saving goes through MediaStore instead.
+     */
+    private String[] getRequiredPermissions() {
+        ArrayList<String> permissions = new ArrayList<>();
+        permissions.add("android.permission.READ_EXTERNAL_STORAGE");
+        if (VERSION.SDK_INT <= 28) {
+            permissions.add("android.permission.WRITE_EXTERNAL_STORAGE");
+        }
+        return permissions.toArray(new String[0]);
+    }
+
+    private boolean hasStoragePermission() {
+        for (String permission : getRequiredPermissions()) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void requestStoragePermissionIfNeeded() {
+        if (VERSION.SDK_INT >= 23 && !hasStoragePermission()) {
+            requestPermissions(getRequiredPermissions(), REQUEST_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQUEST_STORAGE || hasStoragePermission()) {
+            return;
+        }
+        boolean canAskAgain = false;
+        for (String permission : permissions) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                canAskAgain = true;
+                break;
+            }
+        }
+        if (canAskAgain) {
+            Toast.makeText(this, "Storage access is needed to find and save WhatsApp statuses.", Toast.LENGTH_LONG).show();
+        } else {
+            // "Don't ask again" — the request dialog can no longer be shown.
+            new AlertDialog.Builder(this)
+                    .setMessage("Storage access is needed to find and save WhatsApp statuses. Please enable it in app settings.")
+                    .setPositiveButton("Open Settings", new android.content.DialogInterface.OnClickListener() {
+                        public void onClick(android.content.DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    Uri.fromParts("package", getPackageName(), null));
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Not now", null)
+                    .show();
         }
     }
 

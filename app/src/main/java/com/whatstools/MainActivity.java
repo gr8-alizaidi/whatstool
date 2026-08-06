@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     //Initialisation Method of this view
     @SuppressLint({"ObsoleteSdkInt"})
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeHelper.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

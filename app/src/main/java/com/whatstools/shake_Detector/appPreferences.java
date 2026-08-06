@@ -8,6 +8,11 @@ import android.preference.PreferenceManager;
 class appPreferences {
     private SharedPreferences sharedPreferences;
 
+    public static final String THEME_KEY = "app_theme_mode";
+    public static final int THEME_LIGHT = 0;
+    public static final int THEME_DARK = 1;
+    public static final int THEME_AUTO = 2;
+
     appPreferences(Context context) {
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -57,5 +62,13 @@ class appPreferences {
 
     Float getFloat(String key, Float defValue) throws ClassCastException {
         return this.sharedPreferences.getFloat(key, defValue);
+    }
+
+    public void setTheme(int themeMode) {
+        putInt(THEME_KEY, themeMode);
+    }
+
+    public int getTheme() {
+        return getInt(THEME_KEY, THEME_LIGHT);
     }
 }

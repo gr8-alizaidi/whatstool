@@ -6,18 +6,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.whatstools.R;
+import com.whatstools.ThemeHelper;
+import com.whatstools.shake_Detector.appPreferences;
 
 public class ScreenLimitSettingsActivity extends AppCompatActivity {
     private CheckBox enableLimit;
     private EditText hoursInput;
     private EditText minutesInput;
     private TextView usageText;
+    private RadioGroup themeGroup;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +34,7 @@ public class ScreenLimitSettingsActivity extends AppCompatActivity {
         this.usageText = findViewById(R.id.txtUsage);
         Button saveButton = findViewById(R.id.btnSaveLimit);
         Button openBlockScreen = findViewById(R.id.btnOpenBlockScreen);
+        this.themeGroup = findViewById(R.id.themeRadioGroup);
 
         final android.content.SharedPreferences prefs = ScreenLimitManager.prefs(this);
         ScreenLimitManager.resetIfNewDay(prefs);
@@ -38,6 +44,32 @@ public class ScreenLimitSettingsActivity extends AppCompatActivity {
         this.hoursInput.setText(String.valueOf(totalMinutes / 60));
         this.minutesInput.setText(String.valueOf(totalMinutes % 60));
         refreshUsageText(prefs);
+
+        appPreferences appPrefs = new appPreferences(this);
+        int currentTheme = appPrefs.getTheme();
+        switch (currentTheme) {
+            case appPreferences.THEME_DARK:
+                this.themeGroup.check(R.id.radioDarkTheme);
+                break;
+            case appPreferences.THEME_AUTO:
+                this.themeGroup.check(R.id.radioAutoTheme);
+                break;
+            case appPreferences.THEME_LIGHT:
+            default:
+                this.themeGroup.check(R.id.radioLightTheme);
+                break;
+        }
+
+        this.themeGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            int selectedTheme = appPreferences.THEME_LIGHT;
+            if (checkedId == R.id.radioDarkTheme) {
+                selectedTheme = appPreferences.THEME_DARK;
+            } else if (checkedId == R.id.radioAutoTheme) {
+                selectedTheme = appPreferences.THEME_AUTO;
+            }
+            ThemeHelper.setTheme(ScreenLimitSettingsActivity.this, selectedTheme);
+            Toast.makeText(ScreenLimitSettingsActivity.this, "Theme changed. Restart the app to apply fully.", Toast.LENGTH_SHORT).show();
+        });
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

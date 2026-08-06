@@ -35,6 +35,7 @@ import com.whatstools.textRepeater.MainTextRepeater;
 import com.whatstools.screenlimit.ScreenLimitSettingsActivity;
 import com.whatstools.walkChat.WalkMainActivity;
 import com.whatstools.whatsWebScan.WebActivity;
+import com.whatstools.shake_Detector.appPreferences;
 
 public class MainActivity extends AppCompatActivity {
     public static int countAds;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     //Initialisation Method of this view
     @SuppressLint({"ObsoleteSdkInt"})
     protected void onCreate(Bundle savedInstanceState) {
+        applyTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -145,6 +147,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void applyTheme() {
+        appPreferences prefs = new appPreferences(this);
+        if (prefs.isDarkModeEnabled()) {
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppThemeLight);
+        }
+    }
 
     //Click event of Button Whatsapp Shortcut
     private class btnWhatsappShortcutListner implements OnClickListener {

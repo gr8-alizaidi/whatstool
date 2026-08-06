@@ -58,4 +58,28 @@ class appPreferences {
     Float getFloat(String key, Float defValue) throws ClassCastException {
         return this.sharedPreferences.getFloat(key, defValue);
     }
+
+    public void setThemeMode(boolean isDarkMode) {
+        try {
+            Editor prefEdit = this.sharedPreferences.edit();
+            prefEdit.putBoolean("theme_dark_mode", isDarkMode);
+            prefEdit.apply();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isDarkModeEnabled() {
+        try {
+            return this.sharedPreferences.getBoolean("theme_dark_mode", false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void toggleThemeMode() {
+        boolean isDarkMode = isDarkModeEnabled();
+        setThemeMode(!isDarkMode);
+    }
 }

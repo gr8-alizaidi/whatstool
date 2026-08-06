@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#ff1a1a1a</color>
+    <color name="brand_red">#ffff6b6b</color>
+    <color name="colorPrimaryss">#ff4ecdc4</color>
+    <color name="colorPrimaryDarkss">#ff2a9d8f</color>
+
+    <color name="colorAccent">#ff6c5ce7</color>
+    <color name="colorPrimary">#ff5f27cd</color>
+    <color name="colorPrimaryDark">#ff341f97</color>
+    <color name="colorPrimaryz">#ff121212</color>
+
+    <color name="default_circular_color">#ff2a2a2a</color>
+    <color name="default_circular_progress_color">#ff4ecdc4</color>
+    <color name="fcolorAccent">#ffeeeeee</color>
+    <color name="fcolorPrimary">#ff4ecdc4</color>
+    <color name="fcolorPrimaryDark">#ff2a9d8f</color>
+    <color name="white">#ff121212</color>
+    <color name="textcolor">#ffb0bec5</color>
+    <color name="statusTextColor">#ffe0e0e0</color>
+</resources>

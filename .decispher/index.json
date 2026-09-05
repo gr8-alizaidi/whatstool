@@ -1,6 +1,6 @@
 {
   "schema": "decispher-context-map/v1",
-  "generatedAt": "2026-07-22T19:03:09.377Z",
+  "generatedAt": "2026-09-05T23:42:31.916Z",
   "project": {
     "id": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
     "name": "Demo"
@@ -36,9 +36,9 @@
       "id": "c/decispher-demo-mri2fy8z/whatstool-design-choice",
       "label": "whatstool design choice",
       "description": "This topic covers all the design choice we made for our app",
-      "unitCount": 4,
+      "unitCount": 7,
       "spineUnitCount": 0,
-      "expansionUnitCount": 4,
+      "expansionUnitCount": 7,
       "tokensInStub": 0,
       "stubPath": ".decispher/topics/c/decispher-demo-mri2fy8z/whatstool-design-choice.md",
       "mcpTool": "decispher.get_context_for_topic"
@@ -55,6 +55,7 @@
       "decispher.list_topics",
       "decispher.search_decisions",
       "decispher.get_decision",
+      "decispher.get_related_context",
       "decispher.ask_knowledge_base",
       "decispher.capture_decision",
       "decispher.update_context_metadata",
@@ -63,8 +64,11 @@
       "decispher.session_record",
       "decispher.store_link",
       "decispher.store_list",
+      "decispher.remember",
+      "decispher.get_memory",
       "decispher.copy_chat",
-      "decispher.paste_chat"
+      "decispher.paste_chat",
+      "decispher.list_clips"
     ]
   }
 }

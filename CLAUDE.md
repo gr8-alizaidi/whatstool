@@ -45,7 +45,8 @@ Fetch the full topic context before writing code:
 - `decispher.get_context_for_topic` — load the full spine + expansion for a topic listed in this file
 - `decispher.list_topics` — discover the live topic catalog (may include topics added since last sync)
 - `decispher.search_decisions` — semantic search across all context units when no single topic fits
-- `decispher.get_decision` — fetch the authoritative body of one decision by its UUID
+- `decispher.get_decision` — fetch the authoritative body of one decision by its UUID. The response carries `related` (graph neighbours); a `scoped: false` SUPERSEDES or CONTRADICTS entry means something outside your scope contests this unit — treat it as contested
+- `decispher.get_related_context` — before changing or contradicting a decision, check what it supersedes, extends, or conflicts with — one bounded subgraph instead of chasing IDs
 - `decispher.ask_knowledge_base` — open-ended "why is X this way" — synthesized answer with citations
 - `decispher.capture_decision` — whenever you or the user establish durable context worth recalling next session — a decision, convention, constraint, rationale, ownership, history, or plan — record it (pick the matching type). If a near-identical unit already exists it is returned untouched, so capturing is safe
 - `decispher.update_context_metadata` — after re-validating an existing unit against live code, or when its expiry / affected files / tags / severity change — patch the metadata, or set stillAccurate to refresh it. Never use for body changes (capture a superseding unit instead)
@@ -54,10 +55,13 @@ Fetch the full topic context before writing code:
 - `decispher.session_record` — whenever you make a non-obvious decision, discover a constraint, or abandon an approach mid-session, record a one-line statement + reasoning — the rejected-attempt history no one else captures
 - `decispher.store_link` — link an existing corpus decision (by UUID) to this branch store when the branch depends on it
 - `decispher.store_list` — list the branch stores visible to your key — find an active branch by name
+- `decispher.remember` — When the human tells you to remember something durable about how they work ("always use pnpm here", "staging DB is on port 5433"), call `remember` with `userRequested: true`. That saves it active immediately. When the human corrects you on the same thing a second time, propose it: call `remember` WITHOUT `userRequested`. Once per fact per session, and only for how they work (preference, working style, team norm). Do not propose facts about systems or people, which are true or false regardless of who repeats them. Report what came back, never what you attempted. The response carries `status`, `gist` and `outcome`: say "saved" only for an active write, and "proposed, confirm it in your dashboard" for a proposal. Saying "I saved that" after a failed call tells the human something untrue about their own record. Default scope is the human's private memory. Project or company scope files a share request for an admin to approve, never an instant team memory.
+- `decispher.get_memory` — Use `get_memory` to dereference one memory id from a served `[decispher memory: manifest]` entry. Relevant memories arrive in your briefing and as labeled `[decispher memory]` sidecars on tool responses. You never search for them, and there is deliberately no memory search tool. The injected block is assembled without a model call, so it is a fast approximation. When the human asks HOW MANY, HOW MUCH, HOW LONG, HOW OFTEN, WHICH CAME FIRST, or asks you to compare two amounts, call `ask_knowledge_base` with their question instead of counting the injected memories yourself. That path enumerates the matching rows and counts them, which is exact; reading the block and adding it up is an estimate over whatever happened to be injected.
 
 **Recommend to the user — do NOT call yourself:**
 
 - `decispher.copy_chat` — suggest when the user wants to hand this conversation off to another agent or tool
 - `decispher.paste_chat` — suggest when the user references a chat they captured elsewhere
+- `decispher.list_clips` — suggest when the user has lost the key to a chat they saved
 
 > If decispher MCP is unreachable, fall back to local stubs in .decispher/topics/<topic>.md — they carry the spine and unit IDs but not the full bodies. Retry MCP once it is reachable.

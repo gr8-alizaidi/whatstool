@@ -46,6 +46,22 @@
 
 ---
 
+<!-- DECISION-AD23712C -->
+## Decision: Added Android 11+ package visibility queries for WhatsApp/WhatsApp Business and guarded WalkMainActivity's launch intent to avoid null laun…
+
+**Status**: Active  
+**Date**: 2026-07-23  
+**Severity**: Warning
+
+**Files**:
+- `**/*`
+
+### Context
+
+**Decision:** Added Android 11+ package visibility queries for WhatsApp/WhatsApp Business and guarded WalkMainActivity's launch intent to avoid null launches on newer devices.
+
+---
+
 <!-- DECISION-E67B7433 -->
 ## Decision: Development ownership for Activity base class refactoring
 
@@ -101,6 +117,40 @@
 ### Context
 
 **Decision:** Track WhatsApp foreground sessions in the existing AccessibilityService, accumulate daily usage in shared preferences, reset usage at midnight, and launch a blocking activity once the configured limit is reached. Expose configuration through an XML settings screen and keep the implementation non-Compose.
+
+---
+
+<!-- DECISION-96ACC6A9 -->
+## Decision: Scope defined as extension/fix-up of existing `statusSaver` module using `AndroidManifest.xml`, `StatusSaverMainActivity.java`, and `Recent…
+
+**Status**: Active  
+**Date**: 2026-07-22  
+**Severity**: Warning
+
+**Files**:
+- `**/*`
+
+### Context
+
+**Decision:** - Scope defined as extension/fix-up of existing `statusSaver` module using `AndroidManifest.xml`, `StatusSaverMainActivity.java`, and `RecentStoriesActivity.java`.
+- Identified five core development pillars: media discovery, UI/UX, file management, permissions, and cross-version testing.
+- Established an engineering estimate of 4-6 days for a stable, production-ready implementation.
+
+---
+
+<!-- DECISION-E4CFB2F4 -->
+## Decision: Status saver storage strategy: direct File-API discovery across four WhatsApp status directories (Android/media + legacy, WhatsApp + Busine…
+
+**Status**: Active  
+**Date**: 2026-07-22  
+**Severity**: Warning
+
+**Files**:
+- `**/*`
+
+### Context
+
+**Decision:** Status saver storage strategy: direct File-API discovery across four WhatsApp status directories (Android/media + legacy, WhatsApp + Business) centralized in StatusRepository; saving uses MediaStore with RELATIVE_PATH (Pictures/Movies + "Status Saver") on API 29+ and legacy file copy + media scan below. No SAF/document-tree picker.
 
 ---
 

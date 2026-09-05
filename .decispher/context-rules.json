@@ -1,24 +1,24 @@
 {
   "$schema": "https://decispher.com/schemas/context-rules/v1.json",
   "specVersion": "2.0.0",
-  "generatedAt": "2026-07-22T19:03:09.377Z",
+  "generatedAt": "2026-09-05T23:42:31.916Z",
   "companyId": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16",
   "projectId": "4928ea9c-fc6a-44ca-b36f-fe081b496aae",
   "meta": {
-    "totalRules": 8,
+    "totalRules": 11,
     "rulesByType": {
-      "decision": 3,
+      "decision": 5,
       "convention": 1,
       "constraint": 1,
       "rationale": 0,
       "ownership": 3,
       "history": 0,
-      "plan": 0
+      "plan": 1
     },
     "rulesBySeverity": {
       "CRITICAL": 0,
       "HIGH": 2,
-      "MEDIUM": 4,
+      "MEDIUM": 7,
       "LOW": 2
     },
     "generator": "decispher-context-map@1.0.0"
@@ -71,6 +71,20 @@
       "mcpFetch": "decispher.get_decision({ decisionId: \"02447f82-956e-4249-b2a9-5f3f0db98ac1\" })"
     },
     {
+      "id": "ad23712c-18e1-4917-a8b1-e75638e6b94e",
+      "type": "decision",
+      "title": "Added Android 11+ package visibility queries for WhatsApp/WhatsApp Business and guarded WalkMainActivity's launch intent to avoid null laun…",
+      "severity": "MEDIUM",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "branch:test/bs_4"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"ad23712c-18e1-4917-a8b1-e75638e6b94e\" })"
+    },
+    {
       "id": "e67b7433-0570-4d78-862d-bd8e9db0f0bb",
       "type": "ownership",
       "title": "Development ownership for Activity base class refactoring",
@@ -117,6 +131,34 @@
       "supersededBy": null,
       "enforcement": null,
       "mcpFetch": "decispher.get_decision({ decisionId: \"eb14c947-c61c-473a-a951-c89840fe9280\" })"
+    },
+    {
+      "id": "96acc6a9-bf15-4fd1-9adc-47a1a9de0b76",
+      "type": "plan",
+      "title": "Scope defined as extension/fix-up of existing `statusSaver` module using `AndroidManifest.xml`, `StatusSaverMainActivity.java`, and `Recent…",
+      "severity": "MEDIUM",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "branch:test/bs_3"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"96acc6a9-bf15-4fd1-9adc-47a1a9de0b76\" })"
+    },
+    {
+      "id": "e4cfb2f4-54e5-4073-ba43-0c2023df38a0",
+      "type": "decision",
+      "title": "Status saver storage strategy: direct File-API discovery across four WhatsApp status directories (Android/media + legacy, WhatsApp + Busine…",
+      "severity": "MEDIUM",
+      "status": "active",
+      "affectedFiles": [],
+      "tags": [
+        "branch:test/bs_3"
+      ],
+      "supersededBy": null,
+      "enforcement": null,
+      "mcpFetch": "decispher.get_decision({ decisionId: \"e4cfb2f4-54e5-4073-ba43-0c2023df38a0\" })"
     },
     {
       "id": "b126fbd7-c2df-4390-a2fa-298e0bd8aa43",

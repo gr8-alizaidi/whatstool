@@ -15,10 +15,13 @@ _No spine items — no CRITICAL units in the corpus yet._
 |-------|-------|------:|
 | `c/decispher-demo-mri2fy8z/screen-limit` | screen limit | 1 |
 | `c/decispher-demo-mri2fy8z/team-detail` | team detail | 3 |
-| `c/decispher-demo-mri2fy8z/whatstool-design-choice` | whatstool design choice | 4 |
+| `c/decispher-demo-mri2fy8z/whatstool-design-choice` | whatstool design choice | 7 |
 
 ## Recent changes
 
+- 2026-07-23 · Added Android 11+ package visibility queries for WhatsApp/WhatsApp Business and guarded WalkMainActivity's launch intent to avoid null laun…
+- 2026-07-22 · Status saver storage strategy: direct File-API discovery across four WhatsApp status directories (Android/media + legacy, WhatsApp + Busine…
+- 2026-07-22 · Scope defined as extension/fix-up of existing `statusSaver` module using `AndroidManifest.xml`, `StatusSaverMainActivity.java`, and `Recent…
 - 2026-07-13 · Use notification-based birthday reminders instead of WhatsApp auto-send
 - 2026-07-13 · Apply app branding to all user action output layouts
 - 2026-07-13 · Manager assignment for the Activity revamp teams
@@ -26,7 +29,6 @@ _No spine items — no CRITICAL units in the corpus yet._
 - 2026-07-13 · Development ownership for Activity base class refactoring
 - 2026-07-13 · Create a base class for all Activity classes
 - 2026-07-12 · Use XML layouts instead of Compose for the Whatstool Android application
-- 2026-07-12 · Enforce WhatsApp screen limit with AccessibilityService and SharedPreferences
 
 ## Need something not here?
 

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "decispher": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@decispher/mcp-server@latest"
+      ],
+      "env": {
+        "DECISPHER_API_URL": "https://api.decispher.com",
+        "DECISPHER_API_KEY": "dsk_267fbb72db4cdd9cfe79b8dc9d8905b602018e6ccc753f7e",
+        "DECISPHER_COMPANY_ID": "8122ee9b-d712-4e6a-8fc2-1cbc6783de16"
+      }
+    }
+  }
+}

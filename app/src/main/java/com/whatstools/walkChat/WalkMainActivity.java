@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -43,7 +44,15 @@ public class WalkMainActivity extends AppCompatActivity {
     private class btnOpenWhatsappListner implements OnClickListener {
 
         public void onClick(View v) {
-            WalkMainActivity.this.startActivity(getPackageManager().getLaunchIntentForPackage("com.whatsapp"));
+            Intent launchIntent = WalkMainActivity.this.getPackageManager().getLaunchIntentForPackage("com.whatsapp");
+            if (launchIntent == null) {
+                launchIntent = WalkMainActivity.this.getPackageManager().getLaunchIntentForPackage("com.whatsapp.w4b");
+            }
+            if (launchIntent == null) {
+                Toast.makeText(WalkMainActivity.this, "WhatsApp is not installed on this device.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            WalkMainActivity.this.startActivity(launchIntent);
         }
     }
 

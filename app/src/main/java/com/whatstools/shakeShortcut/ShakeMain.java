@@ -1,11 +1,13 @@
 package com.whatstools.shakeShortcut;
 
+import android.content.Intent;
 import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -43,7 +45,15 @@ public class ShakeMain extends AppCompatActivity {
     //Method of when shake is detect
     private class shakeDetectListner implements ShakeCallback {
         public void onShake() {
-            ShakeMain.this.startActivity(ShakeMain.this.getPackageManager().getLaunchIntentForPackage("com.whatsapp"));
+            Intent launchIntent = ShakeMain.this.getPackageManager().getLaunchIntentForPackage("com.whatsapp");
+            if (launchIntent == null) {
+                launchIntent = ShakeMain.this.getPackageManager().getLaunchIntentForPackage("com.whatsapp.w4b");
+            }
+            if (launchIntent == null) {
+                Toast.makeText(ShakeMain.this, "WhatsApp is not installed on this device.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            ShakeMain.this.startActivity(launchIntent);
         }
     }
 

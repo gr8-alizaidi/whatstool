@@ -20,6 +20,8 @@ import android.view.accessibility.AccessibilityEvent;
 import com.whatstools.R;
 import com.whatstools.screenlimit.ScreenLimitManager;
 import com.whatstools.screenlimit.WhatsAppLimitBlockActivity;
+import android.os.Handler;
+import android.os.Looper;
 
 public class BasicAccessibilityService extends AccessibilityService {
     public static Context context;
@@ -33,6 +35,8 @@ public class BasicAccessibilityService extends AccessibilityService {
     private String lastPackageName;
     private long whatsappSessionStart;
     private SharedPreferences sharedPreferences;
+    private Handler walkChatTimerHandler;
+    private Runnable walkChatTimerRunnable;
 
     @SuppressLint({"ClickableViewAccessibility"})
     public void onServiceConnected() {
@@ -81,6 +85,54 @@ public class BasicAccessibilityService extends AccessibilityService {
         }
     }
 
+    private void startWalkChatTimer() {
+        if (walkChatTimerHandler == null) {
+            walkChatTimerHandler = new Handler(Looper.getMainLooper());
+        }
+        SharedPreferences prefs = WalkChatLimitManager.prefs(this);
+        WalkChatLimitManager.startSession(prefs);
+        scheduleWalkChatCheck();
+    }
+
+    private void scheduleWalkChatCheck() {
+        if (walkChatTimerRunnable != null) {
+            walkChatTimerHandler.removeCallbacks(walkChatTimerRunnable);
+        }
+        walkChatTimerRunnable = () -> {
+            SharedPreferences prefs = WalkChatLimitManager.prefs(this);
+            if (WalkMainActivity.isWalk && WalkChatLimitManager.isLimitExceeded(prefs)) {
+                closeWalkChatFeature(prefs);
+            } else if (WalkMainActivity.isWalk) {
+                scheduleWalkChatCheck();
+            }
+        };
+        walkChatTimerHandler.postDelayed(walkChatTimerRunnable, 1000);
+    }
+
+    private void closeWalkChatFeature(SharedPreferences prefs) {
+        WalkMainActivity.isWalk = false;
+        WalkChatLimitManager.setBlocked(prefs, true);
+        WalkChatLimitManager.endSession(prefs);
+        if (walkChatTimerHandler != null && walkChatTimerRunnable != null) {
+            walkChatTimerHandler.removeCallbacks(walkChatTimerRunnable);
+        }
+        Intent intent = new Intent(this, WalkChatLimitBlockActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        if (view != null) {
+            CameraOverlay.methWinManager();
+            view = null;
+        }
+    }
+
+    private void stopWalkChatTimer() {
+        SharedPreferences prefs = WalkChatLimitManager.prefs(this);
+        WalkChatLimitManager.endSession(prefs);
+        if (walkChatTimerHandler != null && walkChatTimerRunnable != null) {
+            walkChatTimerHandler.removeCallbacks(walkChatTimerRunnable);
+        }
+    }
+
     private ActivityInfo m18198a(ComponentName componentName) {
         try {
             return getPackageManager().getActivityInfo(componentName, 0);
@@ -122,13 +174,24 @@ public class BasicAccessibilityService extends AccessibilityService {
                         this.whatsappSessionStart = now;
                     }
                     if (WalkMainActivity.isWalk) {
+                        SharedPreferences prefs = WalkChatLimitManager.prefs(this);
+                        if (!WalkChatLimitManager.isSessionActive(prefs)) {
+                            startWalkChatTimer();
+                        }
+                        if (WalkChatLimitManager.isLimitExceeded(prefs)) {
+                            closeWalkChatFeature(prefs);
+                            return;
+                        }
                         view = CameraOverlay.methOverlayCheck(this);
                         if (view != null) {
                             view.setAlpha(0.5f);
                         }
+                    } else {
+                        stopWalkChatTimer();
                     }
                 } else if (view != null) {
                     stopTrackingWhatsAppSession(now);
+                    stopWalkChatTimer();
                     CameraOverlay.methWinManager();
                 }
             }
@@ -142,6 +205,7 @@ public class BasicAccessibilityService extends AccessibilityService {
 
     public void onDestroy() {
         stopTrackingWhatsAppSession(System.currentTimeMillis());
+        stopWalkChatTimer();
         super.onDestroy();
     }
 }

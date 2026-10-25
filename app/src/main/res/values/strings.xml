@@ -102,4 +102,10 @@
     <string name="AppID">ca-app-pub-3940256099942544~3347511713</string>
     <string name="interstitial_id">ca-app-pub-3940256099942544/1033173712</string>
     <!-- ADMOB SETUP IDS -->
+
+    <!-- Walk Chat Limit Strings -->
+    <string name="walkChatLimitBlockTitle">15-Minute Limit Reached</string>
+    <string name="walkChatLimitBlockMessage">Your 15-minute Walk &amp; Chat session has ended for your safety. You can restart the feature anytime.</string>
+    <string name="walkChatLimitClose">Close</string>
+    <!-- Walk Chat Limit Strings -->
 </resources>

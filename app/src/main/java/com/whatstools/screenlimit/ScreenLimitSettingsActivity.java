@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.whatstools.R;
+import com.whatstools.shake_Detector.appPreferences;
 
 public class ScreenLimitSettingsActivity extends AppCompatActivity {
     private CheckBox enableLimit;
@@ -20,6 +21,7 @@ public class ScreenLimitSettingsActivity extends AppCompatActivity {
     private TextView usageText;
 
     protected void onCreate(Bundle savedInstanceState) {
+        applyTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_screen_limit_settings);
 
@@ -63,6 +65,15 @@ public class ScreenLimitSettingsActivity extends AppCompatActivity {
                 startActivity(new Intent(ScreenLimitSettingsActivity.this, WhatsAppLimitBlockActivity.class));
             }
         });
+    }
+
+    private void applyTheme() {
+        appPreferences prefs = new appPreferences(this);
+        if (prefs.isDarkModeEnabled()) {
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppThemeLight);
+        }
     }
 
     private int parseSafe(String value) {

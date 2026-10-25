@@ -16,6 +16,7 @@ import com.startapp.android.publish.ads.banner.Mrec;
 import com.startapp.android.publish.adsCommon.StartAppAd;
 import com.whatstools.Internetconnection;
 import com.whatstools.R;
+import com.whatstools.shake_Detector.appPreferences;
 
 public class StatusSaverMainActivity extends AppCompatActivity implements OnClickListener {
     ImageView recent_stories;
@@ -23,6 +24,7 @@ public class StatusSaverMainActivity extends AppCompatActivity implements OnClic
 
     @SuppressLint({"WrongViewCast"})
     protected void onCreate(Bundle savedInstanceState) {
+        applyTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_statussaver);
         getSupportActionBar().setTitle("Status Saver");
@@ -36,6 +38,15 @@ public class StatusSaverMainActivity extends AppCompatActivity implements OnClic
         this.saved_stories = findViewById(R.id.saved_stories);
         this.recent_stories.setOnClickListener(this);
         this.saved_stories.setOnClickListener(this);
+    }
+
+    private void applyTheme() {
+        appPreferences prefs = new appPreferences(this);
+        if (prefs.isDarkModeEnabled()) {
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppThemeLight);
+        }
     }
 
     private void getPermission() {

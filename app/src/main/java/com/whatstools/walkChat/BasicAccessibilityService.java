@@ -70,6 +70,15 @@ public class BasicAccessibilityService extends AccessibilityService {
         startActivity(intent);
     }
 
+    private void closeWalkChatFeature() {
+        WalkMainActivity.isWalk = false;
+        WalkChatTimerManager.stopTimer(this);
+        if (view != null) {
+            CameraOverlay.methWinManager();
+            view = null;
+        }
+    }
+
     private boolean isWhatsAppPackage(String packageName) {
         return "com.whatsapp".equals(packageName) || "com.whatsapp.w4b".equals(packageName);
     }
@@ -122,6 +131,10 @@ public class BasicAccessibilityService extends AccessibilityService {
                         this.whatsappSessionStart = now;
                     }
                     if (WalkMainActivity.isWalk) {
+                        if (WalkChatTimerManager.isTimerExpired(this)) {
+                            closeWalkChatFeature();
+                            return;
+                        }
                         view = CameraOverlay.methOverlayCheck(this);
                         if (view != null) {
                             view.setAlpha(0.5f);
